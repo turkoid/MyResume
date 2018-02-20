@@ -1,8 +1,14 @@
 
 # Created by https://www.gitignore.io/api/latex
 
+## Latex output
+cache/
+
 ## Testing
 testing/
+
+## personal info
+data/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
