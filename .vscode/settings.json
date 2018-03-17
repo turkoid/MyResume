@@ -1,0 +1,24 @@
+{
+    "editor.tabSize": 2,
+
+    "latex-workshop.latex.toolchain": [
+        {
+            "command": "xelatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-output-directory=cache",
+                "%DOC%"
+            ]
+        }
+    ],
+    "latex-workshop.latex.outputDir": "./cache/",
+    "latex-workshop.latex.autoBuild.onSave.enabled": false,
+
+    "files.associations": {
+        "*.tex": "latex-expl3",
+        "*.cls": "latex-expl3",
+        "*.sty": "latex-expl3",
+    },
+}
