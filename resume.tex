@@ -1,15 +1,32 @@
-
-\documentclass[11pt, letter, fontdir=fonts/]{turkoid-resume}
+\documentclass[11pt, letterpaper, fontdir=fonts/]{turkoid-resume}
 
 \begin{document}
-  \job{%
-    organization={Voya, Inc},%
-    title=Software Developer,%
-    location={Minneapolis, MN}%
+\par Hello World!
+\vspace{3em}
+
+\job {
+  organization = {Voya, Inc.},
+  title = Software Developer,
+  location = {Minneapolis, MN},
+  startdate = June 2013,
+  summary = This is a generic summary for the job,
+  detail = {
+    {Detail 1},
+    {\textbf{Detail 2}},
   }
-  \vspace{1em}
-  \job{%
-    title=Software Enginger,%
-    location={Minneapolis, MN}%
-  }
+}
+\vspace{1em}
+
+\education {
+  name = University of Minnesota,
+  degree = 3 years towards a B.S. in Computer Science,
+  location = {Minnepolis, MN}
+}
+\vspace{1em}
+
+\techskill {
+  category = Programming Languages,
+  detail = {Java, SQL, C\#}
+}
+
 \end{document}
