@@ -1,0 +1,110 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{turkoid-util}[2018/03/18 turkoid utility package]
+
+% latex3
+\RequirePackage{expl3}
+\RequirePackage{xparse}
+
+\ExplSyntaxOn
+
+% prints message to log
+%
+% \debug {message}
+\NewDocumentCommand {\debug} {m} {
+  \str_clear_new:c {l_tmpa_str}
+  \str_set:cn {l_tmpa_str} {#1}
+  \str_show:c {l_tmpa_str}
+}
+
+% prints the module keys and their values
+%
+\NewDocumentCommand {\debugmodulekeys} {o} {
+  \IfNoValueF {#1} {
+    \modulecsname [#1]
+  }
+  \seq_map_inline:cn {\str_use:c {l_module_csname_str}} {
+    \par ##1=\getkey {##1}
+  }
+}
+
+% sets the default module for the subsequent add/get operations
+% an optional set of key-value pairs can be sent as well
+%
+% \setupkeys [key-values] {module}
+\NewDocumentCommand {\setupkeys} {o m} {
+  \modulecsname [#2]
+  \str_clear_new:c {l_key_module_str}
+  \str_set:cn {l_key_module_str} {#2}
+  \IfNoValueF {#1} {
+    \keys_set:nn {#2} {#1}
+  }
+}
+
+% builds the csname for the key tl or module key seq
+% moudle name is stripped of spaces and all '/' are replace with '_'
+%
+% \modulekeycsname [module] {append string} {str name} 
+\NewDocumentCommand {\modulekeycsname} {o m m} {
+  \str_clear_new:c {#3}
+  \str_put_right:cn {#3} {l_}
+  \IfNoValueTF {#1} {
+    \str_concat:ccc {#3} {#3} {l_key_module_str}
+  } {
+    \str_put_right:cn {#3} {#1}
+  }
+  \str_put_right:cn {#3} {_#2}
+  \str_remove_all:cn {#3} {~}
+  \str_replace_all:cnn {#3} {/} {_}
+}
+
+% builds the token list csname for the key
+%
+% \keycsname [module] {key}
+\NewDocumentCommand {\keycsname} {o m} {
+  \modulekeycsname [#1] {#2_tl} {l_key_csname_str}
+}
+
+% builds the seq cs name for the module keys
+%
+% \keycsname [module] {key}
+\NewDocumentCommand {\modulecsname} {o} {
+  \modulekeycsname [#1] {seq} {l_module_csname_str}
+}
+
+% defines a key in the module
+%  - creates a token list to store the value
+%  - sets the default value if passed
+%  - sets the initial value if passed
+%
+% \addkey [module] {key} [default] [initial] [override tl name]
+\NewDocumentCommand {\addkey} {o m O{} O{} o} {
+  \IfNoValueTF {#5} {
+    \keycsname [#1] {#2}
+  } {
+    \str_clear_new:c {l_key_csname_str}
+    \str_set:cn {l_key_csname_str} {#5}
+  }
+  \tl_new:c {\str_use:c {l_key_csname_str}}
+  \exp_args:Nf \keys_define:nn {\IfNoValueTF {#1} {\str_use:c {l_key_module_str}} {#1}} {
+    #2 .tl_set:c = {\str_use:c {l_key_csname_str}},
+    #2 .default:n = {#3},
+    #2 .initial:n = {#4},
+  }
+  \modulecsname [#1]
+  \seq_if_exist:cF {\str_use:c {l_module_csname_str}} {
+    \seq_new:c {\str_use:c {l_module_csname_str}}
+  }
+  \seq_put_right:cn {\str_use:c {l_module_csname_str}} {#2}
+}
+
+% retreives the value of the key from the module
+%
+% \getkey [module] {key}
+\NewDocumentCommand {\getkey} {o m} {
+  \keycsname [#1] {#2}
+  \exp_args:Nf \use:c {\str_use:c {l_key_csname_str}}
+}
+
+\ExplSyntaxOff
+
+\endinput
