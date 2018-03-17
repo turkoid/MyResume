@@ -8,6 +8,24 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{turkoid-resume}[2018/01/13 turkoid resume class]
 
+% key-value for class options
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{%
+  family=turkoid,
+  prefix=turkoid@,
+}
+
+% custom font directory
+\DeclareStringOption[/]{fontdir}[/]
+\DeclareVoidOption{draft}{\setlength\overfullrule{5pt}}
+\DeclareVoidOption{final}{\setlength\overfullrule{0pt}}
+
+% pass unused options to article
+\DeclareDefaultOption{%
+  \PassOptionsToClass{\CurrentOption}{article}
+}
+\ProcessKeyvalOptions*
+
 % parent class
 \LoadClass{article}
 
@@ -21,17 +39,6 @@
 \RequirePackage{xcolor}
 % material colors
 \RequirePackage{xcolor-material}
-% key-value
-\RequirePackage{pgfkeys}
-% key-value for class options
-\RequirePackage{kvoptions}
-\SetupKeyvalOptions{%
-  family=turkoid,
-  prefix=turkoid@,
-}
-% custom font directory
-\DeclareStringOption[/]{fontdir}[/]
-\ProcessKeyvalOptions*
 % boolean logic
 \RequirePackage{etoolbox}
 % fonts
@@ -40,6 +47,11 @@
 \RequirePackage[fontdir=\turkoid@fontdir]{material-icons}
 % default font
 \RequirePackage[default,opentype]{sourcesanspro}
+% better tables
+\RequirePackage{tabularx}
+% turkoid utility
+\RequirePackage{turkoid-util}
+
 % document hyperlinks
 \RequirePackage[]{hyperref}
 \hypersetup{%
@@ -56,7 +68,6 @@
 % ========================================
 % setup
 % ========================================
-
 % margin
 \geometry{margin=0.5in}
 % font setup
@@ -81,63 +92,73 @@
 
 \colorlet{sectioncolor}{MaterialRed}
 
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}m{#1}}
+\newcolumntype{\LX}{>{\raggedright\arraybackslash}X}
+\newcolumntype{\CX}{>{\centering\arraybackslash}X}
+\newcolumntype{\RX}{>{\raggedleft\arraybackslash}X}
 % ========================================
 % styling macros
 % ========================================
-\newcommand{\resumesection}[1]{\fontsize{24pt}{1em}\bodyfont\color{sectioncolor}{#1}}
 
-\pgfkeys{/jobs/.cd,
-  organization/.store in=\job@organization, organization/.default=, 
-  title/.store in=\job@title, title/.default=,
-  location/.store in=\job@location, location/.default=,
-  startdate/.store in=\job@startdate, startdate/.default=,
-  enddate/.store in=\job@enddate, enddate/.default=Present,
-  summary/.store in=\job@summary, summary/.default=,
-  detail/.store in=\job@detail, detail/.default=,
-}
-\newcommand{\job}[1]{
-  \pgfkeys{/work experience/.cd,
-    organization,
-    title,
-    location,
-    startdate,
-    enddate,
-    summary,
-    detail,
-    #1
-  }
-}
+\ExplSyntaxOn
 
-\pgfkeys{/education/.cd,
-  name/.store in=\edu@name, name/.default=,
-  degree/.store in\edu@degree, degree/.default=,
-  location/.store in=\edu@location, location/.default=,  
-  startdate/.store in=\edu@startdate, startdate/.default=,
-  enddate/.store in=\edu@enddate, enddate/.default=Present,
-  summary/.store in=\edu@summary, summary/.default=,
-  detail/.store in=\edu@detail, detail/.default=,
-}
-\newcommand{\education}[1]{
-  \pgfkeys{/education/.cd,
-    name,
-    degree,
-    location,
-    startdate,
-    enddate,
-    summary,
-    detail,
-    #1
-  }
+% key setup for job command
+\setupkeys {job}
+\addkey {organization} [<Organization>]
+\addkey {title} [<Title>]
+\addkey {location} [<Location>]
+\addkey {startdate}
+\addkey {enddate} [Present]
+\addkey {summary}
+\addkey {detail}
+
+% adds a job entry
+%
+% \job {key-values}
+\NewDocumentCommand {\job} {m} {
+  \group_begin:
+    \setupkeys [#1] {job}
+    \debugmodulekeys [job]
+  \group_end:
 }
 
-\pgfkeys{/skills/.cd,
-  category/.store in=\skill@category, category/.default=,
-  skills/.store in=\skill@list, skills/.default=,
+% key setup for education command
+\setupkeys {education}
+\addkey {name}
+\addkey {degree}
+\addkey {location}
+\addkey {startdate}
+\addkey {enddate} [Present]
+\addkey {summary}
+\addkey {detail}
+
+% adds a education entry
+%
+% \job {key-values}
+\NewDocumentCommand {\education} {m} {
+  \group_begin:
+    \setupkeys [#1] {education}
+    \debugmodulekeys
+  \group_end:
 }
-\newcommand{\skill}[1]{
-  \pgfkeys{/skills/.cd,
-    category,
-    skills,
-    #1
-  }
+
+% key setup for skill command
+\setupkeys {skill/tech}
+\addkey {category}
+\addkey {detail}
+
+% adds a skill entry
+%
+% \job {key-values}
+\NewDocumentCommand {\techskill} {m} {
+  \group_begin:
+    \setupkeys [#1] {skill/tech}
+    \debugmodulekeys
+  \group_end:
 }
+
+\ExplSyntaxOff
+
+\endinput
